@@ -3,133 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CK Collections</title>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+    <title>CK Collections - Home</title>
+    <script>
+        const BACKEND_URL = "https://your-backend-url.onrender.com"; // Replace with actual backend link
+
+        function addToCart(name, price) {
+            const userId = "testUser"; // Replace with actual user system if needed
+            fetch(`${BACKEND_URL}/cart`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, name, price })
+            }).then(() => updateCartCount());
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            line-height: 1.6;
-            color: #333;
+        function updateCartCount() {
+            const userId = "testUser";
+            fetch(`${BACKEND_URL}/cart/${userId}`)
+                .then(res => res.json())
+                .then(data => document.querySelector('.cart-count').textContent = data.items.length);
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 10%;
-            background: #f4f4f4;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        header .logo {
-            font-size: 2em;
-            font-family: 'Pacifico', cursive;
-            font-weight: 600;
-            color: #ff6600;
-        }
-
-        header .cart {
-            font-size: 1.2em;
-        }
-
-        header nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-        }
-
-        header nav ul li a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 400;
-            transition: color 0.3s;
-        }
-
-        header nav ul li a:hover {
-            color: #ff6600;
-        }
-
-        .products {
-            padding: 50px 10%;
-        }
-
-        .product {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-
-        .product button {
-            padding: 10px 20px;
-            background: #ff6600;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .product button:hover {
-            background: #e55c00;
-        }
-    </style>
+        updateCartCount();
+    </script>
 </head>
 <body>
     <header>
-        <div class="logo">CK Collections</div>
+        <h1>CK Collections</h1>
         <div class="cart">
-            <a href="cart.html" style="text-decoration: none; color: inherit;">
-                🛒 <span class="cart-count">0</span>
-            </a>
+            <a href="cart.html">🛒 <span class="cart-count">0</span></a>
         </div>
-        <nav>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#products">Products</a></li>
-                <li><a href="cart.html">Cart</a></li>
-            </ul>
-        </nav>
     </header>
-
-    <section class="products" id="products">
-        <h1>Products</h1>
+    <section>
         <div class="product">
             <p>Traditional African Dress</p>
             <p>$50</p>
             <button onclick="addToCart('Traditional African Dress', 50)">Add to Cart</button>
         </div>
         <div class="product">
-            <p>Handmade Beaded Necklace</p>
+            <p>Ankara Shirt</p>
             <p>$30</p>
-            <button onclick="addToCart('Handmade Beaded Necklace', 30)">Add to Cart</button>
+            <button onclick="addToCart('Ankara Shirt', 30)">Add to Cart</button>
         </div>
     </section>
-
-    <script>
-        function addToCart(productName, productPrice) {
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            cart.push({ name: productName, price: productPrice });
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-        }
-
-        function updateCartCount() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            document.querySelector('.cart-count').textContent = cart.length;
-        }
-
-        document.addEventListener('DOMContentLoaded', updateCartCount);
-    </script>
 </body>
 </html>
