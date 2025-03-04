@@ -39,26 +39,11 @@
         .product-list {
             margin-top: 20px;
         }
-        nav {
-    text-align: right;
-    margin-top: 10px;
-}
-
-.admin-link {
-    text-decoration: none;
-    font-weight: bold;
-    color: #ff6600;
-    padding: 5px 10px;
-    border: 1px solid #ff6600;
-    border-radius: 5px;
-    transition: 0.3s;
-}
-
-.admin-link:hover {
-    background: #ff6600;
-    color: white;
-}
-
+        img {
+            max-width: 100px;
+            display: block;
+            margin: 10px auto;
+        }
     </style>
 </head>
 <body>
@@ -66,6 +51,7 @@
         <h2>Admin Dashboard</h2>
         <input type="text" id="productName" placeholder="Product Name">
         <input type="number" id="productPrice" placeholder="Price">
+        <input type="file" id="productImage" accept="image/*">
         <button onclick="addProduct()">Add Product</button>
         <div class="product-list" id="productList"></div>
     </div>
@@ -76,11 +62,17 @@
         function addProduct() {
             const name = document.getElementById('productName').value;
             const price = document.getElementById('productPrice').value;
+            const imageInput = document.getElementById('productImage');
+            const imageFile = imageInput.files[0];
+            
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('price', price);
+            formData.append('image', imageFile);
             
             fetch(`${BACKEND_URL}/products`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, price })
+                body: formData
             }).then(response => response.json())
               .then(() => loadProducts());
         }
@@ -92,7 +84,7 @@
                     const productList = document.getElementById('productList');
                     productList.innerHTML = '';
                     data.forEach(product => {
-                        productList.innerHTML += `<p>${product.name} - $${product.price} <button onclick="deleteProduct('${product.id}')">Delete</button></p>`;
+                        productList.innerHTML += `<p>${product.name} - $${product.price} <img src="${product.image}" alt="Product Image"> <button onclick="deleteProduct('${product.id}')">Delete</button></p>`;
                     });
                 });
         }
