@@ -124,6 +124,21 @@
         .product button:hover {
             background: #e55c00;
         }
+
+        .admin-link {
+            margin: 20px;
+            text-align: right;
+        }
+
+        .admin-link a {
+            color: #ff6600;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .admin-link a:hover {
+            text-decoration: underline;
+        }
     </style>
     <script>
         const BACKEND_URL = "https://ck-kollection.onrender.com";
@@ -194,6 +209,9 @@
         <h1>CK Collections</h1>
         <div class="cart" onclick="toggleCart()">🛒 <span class="cart-count">0</span></div>
     </header>
+    <div class="admin-link">
+        <a href="admin.html">Admin Dashboard</a>
+    </div>
     <section></section>
     <div class="cart-modal">
         <h2>Your Cart</h2>
