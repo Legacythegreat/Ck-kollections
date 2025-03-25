@@ -47,23 +47,63 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="loginContainer">
+        <h2>Admin Login</h2>
+        <input type="text" id="adminUsername" placeholder="Username">
+        <input type="password" id="adminPassword" placeholder="Password">
+        <button onclick="adminLogin()">Login</button>
+    </div>
+
+    <div class="container" id="dashboardContainer" style="display: none;">
         <h2>Admin Dashboard</h2>
         <input type="text" id="productName" placeholder="Product Name">
         <input type="number" id="productPrice" placeholder="Price">
         <input type="file" id="productImage" accept="image/*">
         <button onclick="addProduct()">Add Product</button>
         <div class="product-list" id="productList"></div>
+        <button onclick="logout()">Logout</button>
     </div>
 
     <script>
         const BACKEND_URL = "https://ck-kollection.onrender.com";
+
+        function adminLogin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            fetch(`${BACKEND_URL}/admin/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    localStorage.setItem("adminToken", data.token);
+                    showDashboard();
+                } else {
+                    alert("Invalid credentials");
+                }
+            });
+        }
+
+        function showDashboard() {
+            document.getElementById("loginContainer").style.display = "none";
+            document.getElementById("dashboardContainer").style.display = "block";
+            loadProducts();
+        }
 
         function addProduct() {
             const name = document.getElementById('productName').value;
             const price = document.getElementById('productPrice').value;
             const imageInput = document.getElementById('productImage');
             const imageFile = imageInput.files[0];
+            const token = localStorage.getItem("adminToken");
+
+            if (!token) {
+                alert("Unauthorized access");
+                return;
+            }
             
             const formData = new FormData();
             formData.append('name', name);
@@ -72,6 +112,7 @@
             
             fetch(`${BACKEND_URL}/products`, {
                 method: "POST",
+                headers: { "Authorization": `Bearer ${token}` },
                 body: formData
             }).then(response => response.json())
               .then(() => loadProducts());
@@ -90,12 +131,18 @@
         }
 
         function deleteProduct(id) {
+            const token = localStorage.getItem("adminToken");
             fetch(`${BACKEND_URL}/products/${id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
             }).then(() => loadProducts());
         }
 
-        loadProducts();
+        function logout() {
+            localStorage.removeItem("adminToken");
+            document.getElementById("dashboardContainer").style.display = "none";
+            document.getElementById("loginContainer").style.display = "block";
+        }
     </script>
 </body>
 </html>
