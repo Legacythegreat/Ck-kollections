@@ -100,6 +100,12 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        .product img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
         .product p {
             font-size: 1.2em;
             margin: 10px 0;
@@ -121,7 +127,25 @@
     </style>
     <script>
         const BACKEND_URL = "https://ck-kollection.onrender.com";
-        
+
+        async function fetchProducts() {
+            const response = await fetch(`${BACKEND_URL}/products`);
+            const products = await response.json();
+            const productContainer = document.querySelector('section');
+            productContainer.innerHTML = '';
+            products.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.classList.add('product');
+                productElement.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <p>${product.name}</p>
+                    <p>$${product.price}</p>
+                    <button onclick="addToCart('${product.name}', ${product.price})">Add to Cart</button>
+                `;
+                productContainer.appendChild(productElement);
+            });
+        }
+
         function toggleCart() {
             document.querySelector('.cart-modal').classList.toggle('active');
         }
@@ -161,28 +185,16 @@
             }).then(() => updateCart());
         }
 
+        fetchProducts();
         updateCart();
     </script>
 </head>
 <body>
     <header>
         <h1>CK Collections</h1>
-        <div class="cart" onclick="toggleCart()">
-            🛒 <span class="cart-count">0</span>
-        </div>
+        <div class="cart" onclick="toggleCart()">🛒 <span class="cart-count">0</span></div>
     </header>
-    <section>
-        <div class="product">
-            <p>Traditional African Dress</p>
-            <p>$50</p>
-            <button onclick="addToCart('Traditional African Dress', 50)">Add to Cart</button>
-        </div>
-        <div class="product">
-            <p>Ankara Shirt</p>
-            <p>$30</p>
-            <button onclick="addToCart('Ankara Shirt', 30)">Add to Cart</button>
-        </div>
-    </section>
+    <section></section>
     <div class="cart-modal">
         <h2>Your Cart</h2>
         <div class="cart-items"></div>
