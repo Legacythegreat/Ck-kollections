@@ -3,12 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CK Kollections - Home</title>
+    <title>CK Collections - Home</title>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <nav>
-    <a href="dashboard.html" class="admin-link">Admin Dashboard</a>
-</nav>
-
     <style>
         * {
             margin: 0;
@@ -42,11 +38,7 @@
         .cart {
             font-size: 1.5em;
             color: #333;
-        }
-
-        .cart a {
-            text-decoration: none;
-            color: inherit;
+            cursor: pointer;
             position: relative;
         }
 
@@ -59,6 +51,39 @@
             border-radius: 50%;
             padding: 5px 10px;
             font-size: 0.8em;
+        }
+
+        .cart-modal {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 300px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            transition: right 0.3s;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .cart-modal.active {
+            right: 0;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .cart-item button {
+            background: #ff6600;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
         }
 
         section {
@@ -95,32 +120,55 @@
         }
     </style>
     <script>
-        const BACKEND_URL = "https://ck-kollection.onrender.com"; // Replace with actual backend link
+        const BACKEND_URL = "https://ck-kollection.onrender.com";
+        
+        function toggleCart() {
+            document.querySelector('.cart-modal').classList.toggle('active');
+        }
 
         function addToCart(name, price) {
-            const userId = "testUser"; // Replace with actual user system if needed
+            const userId = "testUser";
             fetch(`${BACKEND_URL}/cart`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId, name, price })
-            }).then(() => updateCartCount());
+            }).then(() => updateCart());
         }
 
-        function updateCartCount() {
+        function updateCart() {
             const userId = "testUser";
             fetch(`${BACKEND_URL}/cart/${userId}`)
                 .then(res => res.json())
-                .then(data => document.querySelector('.cart-count').textContent = data.items.length);
+                .then(data => {
+                    document.querySelector('.cart-count').textContent = data.items.length;
+                    const cartItemsContainer = document.querySelector('.cart-items');
+                    cartItemsContainer.innerHTML = '';
+                    data.items.forEach(item => {
+                        const cartItem = document.createElement('div');
+                        cartItem.classList.add('cart-item');
+                        cartItem.innerHTML = `<p>${item.name} - $${item.price}</p> <button onclick="removeFromCart('${item.name}')">Remove</button>`;
+                        cartItemsContainer.appendChild(cartItem);
+                    });
+                });
         }
 
-        updateCartCount();
+        function removeFromCart(name) {
+            const userId = "testUser";
+            fetch(`${BACKEND_URL}/cart/remove`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, name })
+            }).then(() => updateCart());
+        }
+
+        updateCart();
     </script>
 </head>
 <body>
     <header>
-        <h1>CK Kollections</h1>
-        <div class="cart">
-            <a href="cart.html">🛒 <span class="cart-count">0</span></a>
+        <h1>CK Collections</h1>
+        <div class="cart" onclick="toggleCart()">
+            🛒 <span class="cart-count">0</span>
         </div>
     </header>
     <section>
@@ -135,5 +183,10 @@
             <button onclick="addToCart('Ankara Shirt', 30)">Add to Cart</button>
         </div>
     </section>
+    <div class="cart-modal">
+        <h2>Your Cart</h2>
+        <div class="cart-items"></div>
+        <button onclick="toggleCart()">Close</button>
+    </div>
 </body>
 </html>
